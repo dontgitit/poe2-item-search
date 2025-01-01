@@ -1,5 +1,4 @@
-from dataclasses import dataclass
-
+from dataclasses import dataclass, field
 
 item_class_to_filter = {
     'Helmets': 'armour.helmet',
@@ -29,9 +28,16 @@ equipment_re = [
 
 
 @dataclass
+class Pseudo:
+    hint: str
+    weight: float = 1
+
+
+@dataclass
 class Affix:
     mod: str
     trade_id: str
+    pseudos: list[Pseudo] = field(default_factory=list)
 
     def __post_init__(self):
         self.regex = fr"([+-]?\d+)%? (?:to )?{self.mod}( \(implicit\))?"
@@ -43,14 +49,15 @@ affixes = [
     Affix('maximum Mana', '1050105434'),
     Affix('increased Spell Damage', '2974417149'),
     # suffixes
-    Affix('Strength', '4080418644'),
-    Affix('Dexterity', '3261801346'),
-    Affix('Intelligence', '328541901'),
-    Affix('Fire Resistance', '3372524247'),
-    Affix('Cold Resistance', '4220027924'),
-    Affix('Lightning Resistance', '1671376347'),
-    Affix('Chaos Resistance', '2923486259'),
-    Affix('all Elemental Resistances', '2901986750'),
+    Affix('Strength', '4080418644', [Pseudo('stat')]),
+    Affix('Dexterity', '3261801346', [Pseudo('stat')]),
+    Affix('Intelligence', '328541901', [Pseudo('stat')]),
+    Affix('All Attributes', '1379411836', [Pseudo('stat', weight=3)]),
+    Affix('Fire Resistance', '3372524247', [Pseudo('resist')]),
+    Affix('Cold Resistance', '4220027924', [Pseudo('resist')]),
+    Affix('Lightning Resistance', '1671376347', [Pseudo('resist')]),
+    Affix('Chaos Resistance', '2923486259', [Pseudo('resist', weight=1.5)]),
+    Affix('all Elemental Resistances', '2901986750', [Pseudo('resist', weight=3)]),
     Affix('increased Mana Regeneration Rate', '789117908'),
     Affix('increased Critical Hit Chance', '587431675'),
     Affix('increased Critical Damage Bonus', '3556824919'),
@@ -63,4 +70,3 @@ affixes = [
     # weapon accuracy
     Affix('Accuracy Rating', '691932474'),
 ]
-

@@ -16,6 +16,7 @@ class TypeInfo:
     filter: str
     value: str
     filter_type: FilterType
+    create_filter: bool = True
 
 @dataclass
 class Equipment:
@@ -61,7 +62,7 @@ def get_type_info(line: str) -> TypeInfo | None:
     # quality
     match = re.match(affixes.quality_re, line)
     if match:
-        return TypeInfo(line, 'quality', match.group(1), FilterType.RANGE)
+        return TypeInfo(line, 'quality', match.group(1), FilterType.RANGE, create_filter=False)
     return None
 
 
@@ -82,7 +83,7 @@ def get_stat_filter(line: str) -> Stat | None:
         if match:
             stat_value = match.group(1)
             mod_type = 'implicit' if match.group(2) else 'explicit'
-            return Stat(affix, line, mod_type, stat_value)
+            return Stat(affix, line, mod_type, float(stat_value))
     return None
 
 
