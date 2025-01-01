@@ -3,6 +3,8 @@ from enum import StrEnum, auto
 import re
 
 from itemparser.data import affixes
+from itemparser.data.affixes import Affix
+
 
 class FilterType(StrEnum):
     OPTION = auto()
@@ -23,8 +25,8 @@ class Equipment:
 
 @dataclass
 class Stat:
+    affix: Affix
     line: str
-    affix_id: str
     affix_type: str
     value: float
 
@@ -50,17 +52,11 @@ def get_type_info(line: str) -> TypeInfo | None:
         # TODO - move item_class_to_filter to query building part
         item_class_filter = affixes.item_class_to_filter.get(item_class_name)
         if item_class_filter:
-            # query['query']['filters']['type_filters']['filters']['category'] = {
-            #     'option': item_class_filter
-            # }
             return TypeInfo(line, 'category', item_class_filter, FilterType.OPTION)
     # rarity
     match = re.match(affixes.rarity_re, line)
     if match:
         rarity_name = match.group(1)
-        # query['query']['filters']['type_filters']['filters']['rarity'] = {
-        #     'option': rarity_name.lower()
-        # }
         return TypeInfo(line, 'rarity', rarity_name.lower(), FilterType.OPTION)
     # quality
     match = re.match(affixes.quality_re, line)
@@ -71,38 +67,27 @@ def get_type_info(line: str) -> TypeInfo | None:
 
 def get_equipment_filter(line: str, type_infos: list[TypeInfo]) -> Equipment | None:
     quality = get_quality(type_infos)
-    # armor stats
     for (regex, mod) in affixes.equipment_re:
         match = re.match(regex, line)
         if match:
-            # print(f"line is {line} match is {match} with regex {regex}")
             stat_value = int(match.group(1))
-            # print(f"defstat is {stat_value}, quality is {quality}")
             modified_value = stat_value * 1.2 if quality == 0 else stat_value * 1.2 / (1 + quality / 100.0)
-            # query['query']['filters']['equipment_filters']['filters'][mod] = {
-            #     'min': modified_value
-            # }
             return Equipment(line, mod, modified_value)
     return None
 
 
 def get_stat_filter(line: str) -> Stat | None:
-    ## stats
-    for (regex, mod) in affixes.affix_re:
-        match = re.match(regex, line)
-        # print(f"match of {regex} against {line} is {match}")
+    for affix in affixes.affixes:
+        match = re.match(affix.regex, line)
         if match:
             stat_value = match.group(1)
             mod_type = 'implicit' if match.group(2) else 'explicit'
-            return Stat(line, mod, mod_type, stat_value)
-            # stat_filter = create_stat_filter(mod_type, mod, stat_value)
-            # query['query']['stats'][0]['filters'].append(stat_filter)
+            return Stat(affix, line, mod_type, stat_value)
     return None
 
 
 def parse_item(item_string) -> Item:
     print("item is " + item_string)
-    # query = create_trade_request_body()
     type_infos: list[TypeInfo] = []
     equipments: list[Equipment] = []
     stats: list[Stat] = []

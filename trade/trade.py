@@ -77,7 +77,7 @@ def get_equipment_filters(item: Item) -> dict:
 
 def create_stat_filter(stat: Stat):
     return {
-        'id': f"{stat.affix_type}.{stat.affix_id}",
+        'id': f"{stat.affix_type}.stat_{stat.affix.trade_id}",
         'disabled': False,
         'value': {
             'min': stat.value

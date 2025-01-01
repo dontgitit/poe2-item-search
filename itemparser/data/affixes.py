@@ -1,3 +1,6 @@
+from dataclasses import dataclass
+
+
 item_class_to_filter = {
     'Helmets': 'armour.helmet',
     'Body Armours': 'armour.chest',
@@ -24,33 +27,40 @@ equipment_re = [
     (r"Evasion Rating: (\d+)", 'ev'),
 ]
 
-def r(mod):
-    return fr"([+-]?\d+)%? (?:to )?{mod}( \(implicit\))?"
 
-affix_re = [
+@dataclass
+class Affix:
+    mod: str
+    trade_id: str
+
+    def __post_init__(self):
+        self.regex = fr"([+-]?\d+)%? (?:to )?{self.mod}( \(implicit\))?"
+
+
+affixes = [
     # prefixes
-    (r('maximum Life'), 'stat_3299347043'),
-    (r('maximum Mana'), 'stat_1050105434'),
-    (r('increased Spell Damage'), 'stat_2974417149'),
+    Affix('maximum Life', '3299347043'),
+    Affix('maximum Mana', '1050105434'),
+    Affix('increased Spell Damage', '2974417149'),
     # suffixes
-    (r('Strength'), 'stat_4080418644'),
-    (r('Dexterity'), 'stat_3261801346'),
-    (r('Intelligence'), 'stat_328541901'),
-    (r('Fire Resistance'), 'stat_3372524247'),
-    (r('Cold Resistance'), 'stat_4220027924'),
-    (r('Lightning Resistance'), 'stat_1671376347'),
-    (r('Chaos Resistance'), 'stat_2923486259'),
-    (r('all Elemental Resistances'), 'stat_2901986750'),
-    (r('increased Mana Regeneration Rate'), 'stat_789117908'),
-    (r('increased Critical Hit Chance'), 'stat_587431675'),
-    (r('increased Critical Damage Bonus'), 'stat_3556824919'),
-    (r('increased Cast Speed'), 'stat_2891184298'),
+    Affix('Strength', '4080418644'),
+    Affix('Dexterity', '3261801346'),
+    Affix('Intelligence', '328541901'),
+    Affix('Fire Resistance', '3372524247'),
+    Affix('Cold Resistance', '4220027924'),
+    Affix('Lightning Resistance', '1671376347'),
+    Affix('Chaos Resistance', '2923486259'),
+    Affix('all Elemental Resistances', '2901986750'),
+    Affix('increased Mana Regeneration Rate', '789117908'),
+    Affix('increased Critical Hit Chance', '587431675'),
+    Affix('increased Critical Damage Bonus', '3556824919'),
+    Affix('increased Cast Speed', '2891184298'),
     # Either
-    (r('increased Rarity of Items found'), 'stat_3917489142'),
+    Affix('increased Rarity of Items found', '3917489142'),
     # TODO - use correct accuracy filter depending on item class. for now just do non-weapon...
     # other accuracy
-    (r('Accuracy Rating'), 'stat_803737631'),
+    Affix('Accuracy Rating', '803737631'),
     # weapon accuracy
-    (r('Accuracy Rating'), 'stat_691932474'),
+    Affix('Accuracy Rating', '691932474'),
 ]
 
