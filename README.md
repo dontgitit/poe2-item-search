@@ -29,6 +29,8 @@ Then tell your shell to use the virtual environment (must be repeated any time y
 source .venv/bin/activate
 ```
 
+## Install requirements
+
 Finally, install packages:
 ```
 pip install -r requirements.txt
