@@ -19,11 +19,13 @@ item_class_to_filter = {
 item_class_re = r"Item Class: (.+)"
 rarity_re = r"Rarity: (.+)"
 quality_re = r"Quality: \+(\d+)%"
+# TODO - might want to only filter on es/ar/ev if the item has at least two relevant mods
+# for now, don't filter on it at all
 equipment_re = [
-    (r"Energy Shield: (\d+)", 'es'),
-    # the extra stuff for `Armour` is to avoid matching `Armour: ` lines on socketables (runes and soul cores)
-    (r"Armour: (\d+)(?:$| \()", 'ar'),
-    (r"Evasion Rating: (\d+)", 'ev'),
+    # (r"Energy Shield: (\d+)", 'es'),
+    # # the extra stuff for `Armour` is to avoid matching `Armour: ` lines on socketables (runes and soul cores)
+    # (r"Armour: (\d+)(?:$| \()", 'ar'),
+    # (r"Evasion Rating: (\d+)", 'ev'),
 ]
 
 
