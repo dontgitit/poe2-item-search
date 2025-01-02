@@ -68,7 +68,7 @@ affixes = [
     Affix('Strength', '4080418644', [Pseudo(stats), Pseudo(stats_and_resists)]),
     Affix('Dexterity', '3261801346', [Pseudo(stats), Pseudo(stats_and_resists)]),
     Affix('Intelligence', '328541901', [Pseudo(stats), Pseudo(stats_and_resists)]),
-    Affix('All Attributes', '1379411836', [Pseudo(stats, weight=3), Pseudo(stats_and_resists, weight=3)]),
+    Affix('all Attributes', '1379411836', [Pseudo(stats, weight=3), Pseudo(stats_and_resists, weight=3)]),
     Affix('Fire Resistance', '3372524247', [Pseudo(resists), Pseudo(stats_and_resists)]),
     Affix('Cold Resistance', '4220027924', [Pseudo(resists), Pseudo(stats_and_resists)]),
     Affix('Lightning Resistance', '1671376347', [Pseudo(resists), Pseudo(stats_and_resists)]),
