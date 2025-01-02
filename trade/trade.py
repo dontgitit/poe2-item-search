@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 from urllib.parse import quote_plus
 
-from itemparser.data.affixes import Affix, affixes as all_affixes, Pseudo
+from itemparser.data.affixes import Affix, affixes as all_affixes, Pseudo, PseudoMeta
 from itemparser.item_parser import Item, Stat, FilterType
 
 trade_url = 'https://www.pathofexile.com/trade2/search/poe2/Standard'
@@ -96,28 +96,29 @@ def create_stat_filter(stat: Stat):
     return create_affix_filter(stat.affix, stat.affix_type, min=stat.value, disabled=not not stat.affix.pseudos)
 
 
-def get_pseudo_by_hint(affix: Affix, pseudo_hint: str) -> Pseudo | None:
-    return next((pseudo for pseudo in affix.pseudos if pseudo.hint == pseudo_hint), None)
+def get_pseudo_by_meta(affix: Affix, meta: PseudoMeta) -> Pseudo | None:
+    return next((pseudo for pseudo in affix.pseudos if pseudo.meta is meta), None)
 
 
-def create_weight_filter(pseudo_hint: str, affixes: list[Affix], total: float):
+def create_weight_filter(meta: PseudoMeta, affixes: list[Affix], total: float):
     # TODO - would be nice to also include `enchant` and `rune` but that leads to `query too complex` from trade...
-    filters = [create_affix_filter(affix, affix_type, weight=get_pseudo_by_hint(affix, pseudo_hint).weight) for affix_type in ['explicit', 'implicit'] for affix in affixes]
+    filters = [create_affix_filter(affix, affix_type, weight=get_pseudo_by_meta(affix, meta).weight) for affix_type in ['explicit', 'implicit'] for affix in affixes]
     return {
         'type': 'weight2',
         'filters': filters,
         'value': {
             'min': total
-        }
+        },
+        'disabled': meta.disabled
     }
 
 
-def affix_is_part_of_pseudo_hint(affix: Affix, pseudo_hint: str) -> bool:
-    return not not get_pseudo_by_hint(affix, pseudo_hint)
+def affix_is_part_of_pseudo_meta(affix: Affix, meta: PseudoMeta) -> bool:
+    return not not get_pseudo_by_meta(affix, meta)
 
 
-def get_affixes_for_hint(hint: str) -> list[Affix]:
-    return [affix for affix in all_affixes if affix_is_part_of_pseudo_hint(affix, hint)]
+def get_affixes_for_hint(meta: PseudoMeta) -> list[Affix]:
+    return [affix for affix in all_affixes if affix_is_part_of_pseudo_meta(affix, meta)]
 
 
 def get_stat_filters(item: Item) -> list[dict]:
@@ -130,10 +131,10 @@ def get_stat_filters(item: Item) -> list[dict]:
         pseudos = defaultdict(float)
         for stat in item.stats:
             for pseudo in stat.affix.pseudos:
-                pseudos[pseudo.hint] += stat.value * pseudo.weight
+                pseudos[pseudo.meta] += stat.value * pseudo.weight
         pseudo_filters = [
-            create_weight_filter(hint, get_affixes_for_hint(hint), total)
-            for (hint, total) in pseudos.items()
+            create_weight_filter(meta, get_affixes_for_hint(meta), total)
+            for (meta, total) in sorted(pseudos.items(), key=lambda meta_and_total: meta_and_total[0].sort_order)
         ]
         return [and_filter] + pseudo_filters
     return []
