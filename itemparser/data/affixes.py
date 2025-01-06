@@ -77,7 +77,9 @@ affixes = [
     Affix('increased Mana Regeneration Rate', '789117908'),
     Affix('increased Critical Hit Chance', '587431675'),
     Affix('increased Critical Damage Bonus', '3556824919'),
+    Affix('increased Critical Spell Damage Bonus', '274716455'),
     Affix('increased Cast Speed', '2891184298'),
+    Affix('Level of all Spell Skills', '124131830'),
     # Either
     Affix('increased Rarity of Items found', '3917489142'),
     # TODO - use correct accuracy filter depending on item class. for now just do non-weapon...
